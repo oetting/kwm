@@ -426,7 +426,8 @@ void UpdateActiveWindowList(screen_info *Screen)
         }
 
         DEBUG("UpdateActiveWindowList() Active Display Changed")
-        FocusWindowBelowCursor();
+        if(KwmFocusMode != FocusModeDisabled)
+            FocusWindowBelowCursor();
     }
     else
     {
@@ -439,7 +440,8 @@ void UpdateActiveWindowList(screen_info *Screen)
 
             Screen->ActiveSpace = CurrentSpace;
             DisplayIdentifier = CGSCopyManagedDisplayForSpace(CGSDefaultConnection, Screen->ActiveSpace);
-            FocusWindowBelowCursor();
+            if(KwmFocusMode != FocusModeDisabled)
+                FocusWindowBelowCursor();
         }
     }
 
