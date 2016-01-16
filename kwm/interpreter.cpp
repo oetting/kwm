@@ -196,7 +196,6 @@ void KwmReadCommand(std::vector<std::string> &Tokens, int ClientSockFD)
         if(KWMFocus.Window)
             Output += " " + KWMFocus.Window->Owner + (KWMFocus.Window->Name != "" ? " - " + KWMFocus.Window->Name : "");
 
-
         KwmWriteToSocket(ClientSockFD, Output);
     }
     if(Tokens[1] == "marked")
