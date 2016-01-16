@@ -194,7 +194,8 @@ void KwmReadCommand(std::vector<std::string> &Tokens, int ClientSockFD)
         GetTagForCurrentSpace(Output);
 
         if(KWMFocus.Window)
-            Output += " " + KWMFocus.Window->Owner + " - " + KWMFocus.Window->Name;
+            Output += " " + KWMFocus.Window->Owner + (KWMFocus.Window->Name != "" ? " - " + KWMFocus.Window->Name : "");
+
 
         KwmWriteToSocket(ClientSockFD, Output);
     }
