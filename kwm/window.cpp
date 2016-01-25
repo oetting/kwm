@@ -1025,25 +1025,19 @@ bool WindowIsInDirection(window_info *A, window_info *B, int Degrees)
 {
     bool Result = false;
 
-    if(Degrees == 0)
+    if(Degrees == 0 || Degrees == 180)
     {
-        if(B->Y + B->Height < A->Y)
+        if(fmax(A->X, B->X) < fmin(B->X + B->Width, A->X + A->Width)
+            && A->Y != B->Y)
             Result = true;
+
     }
-    else if(Degrees == 90)
+    else if(Degrees == 90 || Degrees == 270)
     {
-        if(B->X > A->X + A->Width)
+        if(fmax(A->Y, B->Y) < fmin(B->Y + B->Height, A->Y + A->Height)
+            && A->X != B->X)
             Result = true;
-    }
-    else if(Degrees == 180)
-    {
-        if(B->Y > A->Y + A->Height)
-            Result = true;
-    }
-    else if(Degrees == 270)
-    {
-        if(B->X + B->Width < A->X)
-            Result = true;
+        
     }
 
     return Result;
@@ -1081,13 +1075,33 @@ bool FindClosestWindow(int Degrees, window_info *Target)
     window_info *Match = KWMFocus.Window;
     std::vector<window_info> Windows = KWMTiling.WindowLst;
 
+    int matchX;
+    int matchY;
+    GetCenterOfWindow(Match, &matchX, &matchY);
+
     double MinDist = INT_MAX;
     for(int Index = 0; Index < Windows.size(); ++Index)
     {
-        if(!WindowsAreEqual(Match, &Windows[Index]) &&
+        if(!WindowsAreEqual(Match, &Windows[Index]) && 
             WindowIsInDirection(Match, &Windows[Index], Degrees))
         {
-            double Dist = GetWindowDistance(Match, &Windows[Index]);
+
+            int centerX;
+            int centerY;
+            GetCenterOfWindow(&Windows[Index], &centerX, &centerY);
+
+            window_info wrappedWindow = Windows[Index];
+            if(Degrees == 0 && matchY < centerY) {
+                wrappedWindow.Y -= KWMScreen.Current->Height;
+            } else if(Degrees == 180 && matchY > centerY) {
+                wrappedWindow.Y += KWMScreen.Current->Height;
+            } else if(Degrees == 90 && matchX > centerX) {
+                wrappedWindow.X += KWMScreen.Current->Width;
+            } else if(Degrees == 270 && matchX < centerX) {
+                wrappedWindow.X -= KWMScreen.Current->Width;
+            }
+
+            double Dist = GetWindowDistance(Match, &wrappedWindow);
             if(Dist < MinDist)
             {
                 MinDist = Dist;
